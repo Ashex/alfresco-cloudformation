@@ -6,7 +6,7 @@
         "KeyName": 
         {
             "Type": "String",
-            "Default": "hollandr-pub",
+           
             "Description": "Name of an existing EC2 KeyPair, all instances will launch with this KeyPair"
         },
        "SSHFrom" :
@@ -23,8 +23,8 @@
         {
             "Type":"String",
             "Description" : "First availabiltiy zone to deploy into",
-            "Default": "us-east-1a",
-            "AllowedValues" : ["eu-west-1a","eu-west-1b","eu-west-1c","us-east-1a","us-east-1b","us-east-1c","us-east-1d","us-west-1a","us-west-1b","ap-southeast-1a","ap-southeast-1b","ap-northeast-1a","ap-northeast-1b","ap-northeast-1c","us-west-2a","us-west-2b","us-west-2c","sa-east-1a","sa-east-1b, ap2-southeast-1b, ap2-southeast-1a"],
+           
+            "AllowedValues" : ["eu-west-1a","eu-west-1b","eu-west-1c","us-east-1a","us-east-1b","us-east-1c","us-east-1d","us-west-1a","us-west-1b","us-west-1c","ap-southeast-1a","ap-southeast-1b","ap-northeast-1a","ap-northeast-1b","ap-northeast-1c","us-west-2a","us-west-2b","us-west-2c","sa-east-1a","sa-east-1b, ap2-southeast-1b, ap2-southeast-1a"],
             "ConstraintDescription" : "Must be a valid EC2 Availabilty zone"            
         },
         
@@ -32,8 +32,8 @@
         {
             "Type":"String",
             "Description" : "Second availabiltiy zone to deploy into",
-            "Default": "us-east-1b",
-            "AllowedValues" : ["eu-west-1a","eu-west-1b","eu-west-1c","us-east-1a","us-east-1b","us-east-1c","us-east-1d","us-west-1a","us-west-1b","ap-southeast-1a","ap-southeast-1b","ap-northeast-1a","ap-northeast-1b","ap-northeast-1c","us-west-2a","us-west-2b","us-west-2c","sa-east-1a","sa-east-1b, ap2-southeast-1b, ap2-southeast-1a"],
+           
+            "AllowedValues" : ["eu-west-1a","eu-west-1b","eu-west-1c","us-east-1a","us-east-1b","us-east-1c","us-east-1d","us-west-1a","us-west-1b","us-west-1c","ap-southeast-1a","ap-southeast-1b","ap-northeast-1a","ap-northeast-1b","ap-northeast-1c","us-west-2a","us-west-2b","us-west-2c","sa-east-1a","sa-east-1b, ap2-southeast-1b, ap2-southeast-1a"],
             "ConstraintDescription" : "Must be a valid EC2 Availabilty zone"            
         },
        
@@ -402,6 +402,7 @@
            "#!/bin/bash -v\n",  
             "yum update -y aws* \n", 
             "yum install -y python-boto*\n" , 
+            "easy_install -U boto\n",  
             "echo #!/bin/bash -v >> /tmp/configSetup.sh \n", 
             "echo export ELB_NAME=", { "Ref" : "ElasticLoadBalancer"  },"  >> /tmp/configSetup.sh \n", 
             "echo export AWS_REGION=", {"Ref" : "AWS::Region"  }, " >> /tmp/configSetup.sh \n", 
@@ -442,16 +443,15 @@
             "sed -i 's/@@AWS_SECRET_KEY@@/", {"Fn::GetAtt": ["CFNKeys", "SecretAccessKey"]}, "/g' custom-slingshot-application-context.xml\n", 
             "sed -i 's/@@AWS_REGION@@/", {"Ref" : "AWS::Region"},"/g' custom-slingshot-application-context.xml\n", 
             "sed -i 's/@@AWS_SECURITY_GROUP@@/",{ "Ref" : "AlfrescoSecurityGroup"} , "/g' custom-slingshot-application-context.xml\n", 
-            
             "mv /home/ec2-user/hazelcast-ec2.xml /opt/alfresco/tomcat/shared/classes/alfresco/extension\n",
             "mv /home/ec2-user/cache-context.xmll /opt/alfresco/tomcat/shared/classes/alfresco/extension\n",
             "mv /home/ec2-user/ehcache-custom.xml /opt/alfresco/tomcat/shared/classes/alfresco/extension\n",
             "mv /home/ec2-user/custom-slingshot-application-context.xml /opt/alfresco/tomcat/shared/classes/alfresco/web-extension\n",
-
             "wget https://s3.amazonaws.com/publisher-bucket/bin/aws-publisher_install.sh\n", 
             "chmod u+x /home/ec2-user/aws-publisher_install.sh\n",
+            "mkdir /etc/aws-publisher\n", 
+            "echo product.code   AlfrescoEnterprise > /etc/aws-publisher/cw.conf\n",
             "/home/ec2-user/aws-publisher_install.sh\n",
-            "echo product.code   AlfrescoEnterprise > /etc/aws-publisher/cw.conf\n",   
             "service aws-publisher stop \n",
             "service alfresco start\n",
             "sleep 330\n",
